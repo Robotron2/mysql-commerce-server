@@ -52,11 +52,12 @@ const loginUser = async (req, res) => {
 				return res.json({ error: "Incorrect login details", success: false })
 			}
 			// return res.json({ user, match: match })
-			let token = JWT.sign({ id: user.id }, secretKey, { expiresIn: "1d" })
+			let userInfo = { id: user.id, username: user.username, email: user.email, address: user.address, phone: user.phone_number, role: user.role }
+			let token = JWT.sign(userInfo, secretKey, { expiresIn: "1d" })
 			return res.status(200).send({
 				success: true,
 				message: "Logged in successfully",
-				user: { id: user.id, username: user.username, email: user.email, address: user.address, phone: user.phone_number, role: user.role },
+				user: userInfo,
 				token
 			})
 			// res.json({ token: accessToken, username: username, id: user.id })

@@ -17,13 +17,13 @@ const createProductController = async (req, res) => {
 		return res.status(201).json({ message: "Product created successfully!", product })
 	} catch (error) {
 		console.error("Error storing image details in the database:", error)
-		res.status(500).json({ error: error.message })
+		res.status(500).json({ error: error.message, success: false })
 	}
 }
 
 const getAllProductsController = async (req, res) => {
 	try {
-		const allProducts = await Product.findAll({ include: Category })
+		const allProducts = await Product.findAll({ include: Category }, { attributes: ["category_name"] })
 		return res.json({ products: allProducts })
 	} catch (error) {
 		res.status(500).json({ error: error.message })
