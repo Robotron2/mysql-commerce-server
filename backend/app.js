@@ -12,8 +12,12 @@ app.use(morgan("dev"))
 
 //Routers
 const UserRouter = require("./routes/Users")
+const ProductRouter = require("./routes/Products")
+const CategoryRouter = require("./routes/Category")
 
 app.use("/auth/user", UserRouter)
+app.use("/products", ProductRouter)
+app.use("/category", CategoryRouter)
 
 db.sequelize.sync({ alter: true }).then(() => {
 	app.listen(4000, () => {
