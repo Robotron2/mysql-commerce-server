@@ -3,8 +3,16 @@ import Header from "../../Components/Layouts/Header"
 import Image from "../../assets/image1.jpg"
 import Image2 from "../../assets/image2.jpg"
 import Footer from "../../Components/Layouts/Footer"
+
+// Import Swiper React components
+import { Swiper, SwiperSlide } from "swiper/react"
+import { Navigation, Pagination, Scrollbar, A11y, Autoplay } from "swiper/modules"
+
+// Import Swiper styles
+import "swiper/css"
 function Home() {
 	const myArray = [1, 2, 3, 4, 5, 6]
+	const sliderArray = ["Image", "Image2", "Image", "Image2"]
 	return (
 		<>
 			<Header />
@@ -22,9 +30,36 @@ function Home() {
 			</div>
 			<div className="showCase grid grid-cols-4 grid-flow-row gap-4 px-44 mt-6 cursor-pointer">
 				<div className="large col-span-3 rounded shadow-xl">
-					<Link to={"https://google.com"}>
-						<img src={Image} alt="product-img" className="w-full object-cover h-80 rounded-md" />
-					</Link>
+					<Swiper
+						// install Swiper modules
+						modules={[Navigation, Pagination, Scrollbar, A11y, Autoplay]}
+						spaceBetween={30}
+						centeredSlides={true}
+						autoplay={{
+							delay: 2000,
+							disableOnInteraction: false
+						}}
+						pagination={{
+							clickable: true
+						}}
+						navigation={true}
+						slidesPerView={1}
+						scrollbar={{ draggable: true }}
+						onSwiper={(swiper) => console.log(swiper)}
+						loop={true}
+					>
+						{sliderArray.map((item, i) => {
+							return (
+								<>
+									<SwiperSlide key={i}>
+										<Link to={"https://google.com"}>
+											<img src={item === "Image" ? Image : Image2} alt="product-img" className="w-full object-cover h-80 rounded-md" />
+										</Link>
+									</SwiperSlide>
+								</>
+							)
+						})}
+					</Swiper>
 				</div>
 				<div className="show-grid col-span-1 grid grid-cols-4 gap-4 shadow-xl">
 					<div className=" col-span-2 rounded">
@@ -74,6 +109,7 @@ function Home() {
 					})}
 				</div>
 			</div>
+
 			<Footer />
 		</>
 	)

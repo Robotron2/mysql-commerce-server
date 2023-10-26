@@ -5,17 +5,20 @@ const Header = () => {
 	return (
 		<>
 			<div className="bg-gray-800 text-white p-4">
-				<div className="flex justify-between px-40 items-center">
-					<div className="logo flex items-center">
-						<img src={brand} alt="Brand" className="w-full h-10" />
+				<div className="flex justify-between md:px-20 items-center">
+					<div className="nav-menu text-white text-2xl md:hidden flex items-center"></div>
+					<div className="logo hidden md:flex items-center">
+						<img src={brand} alt="Brand" className="w-10 lg:w-full h-10" />
 						<h1 className="font-bold text-gray-100">RoboShopp</h1>
 					</div>
+
 					<div className="search flex bg-gray-500 items-center w-96 p-2 rounded-full">
 						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6">
 							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
 						</svg>
 						<input type="text" placeholder="Search product name, category or type" className="w-full bg-transparent focus:outline-none" />
 					</div>
+
 					<div className="login flex justify-between items-center w-56">
 						<Link className="mx-1 bg-white text-gray-900 p-2 rounded-full w-full text-sm text-center hover:bg-slate-500 hover:text-white transition duration-300 ease-in-out">Login</Link>
 						<Link className="mx-1 bg-white text-gray-900 p-2 rounded-full w-full text-sm text-center hover:bg-slate-500 hover:text-white transition duration-300 ease-in-out">Sign Up</Link>
