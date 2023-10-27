@@ -6,8 +6,8 @@ const Footer = () => {
 
 	return (
 		<>
-			<div className="bg-gray-500 p-2 text-gray-200 mt-8 ">
-				<div className="flex justify-between px-40 items-center">
+			<div className=" bg-gray-500 p-2 text-gray-200 mt-8 ">
+				<div className=" lg:flex justify-between md:hidden  lg:px-40 items-center">
 					{myArray.map((_, i) => {
 						return (
 							<div className="linkss flex justify-center items-start hover:text-white" key={i}>
@@ -30,19 +30,26 @@ const Footer = () => {
 							</div>
 						)
 					})}
-					<div className="search flex bg-gray-100 items-center w-96 p-2 rounded-full">
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 text-gray-700">
-							<path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-						</svg>
-						<input type="text" placeholder="Search product name, category or type" className="w-full bg-transparent text-gray-700 focus:outline-none" />
+
+					<div className="flex justify-center">
+						<div className=" flex bg-gray-100 items-center w-96 p-2 rounded border-r-0 rounded-tr-none rounded-br-none">
+							<input type="text" placeholder="Email support" className="w-full bg-transparent text-gray-700 focus:outline-none" />
+						</div>
+						<button className="bg-gray-800 rounded ml-0 rounded-tl-none rounded-bl-none p-2">Submit</button>
 					</div>
 				</div>
+				{/* md:mt-8 */}
+				<div className="flex justify-center lg:hidden">
+					<div className=" flex bg-gray-100 items-center w-96 p-2 rounded border-r-0 rounded-tr-none rounded-br-none">
+						<input type="text" placeholder="Email support" className="w-full bg-transparent text-gray-700 focus:outline-none" />
+					</div>
+					<button className="bg-gray-800 rounded ml-0 rounded-tl-none rounded-bl-none p-2">Submit</button>
+				</div>
 			</div>
-			<div className="footer bg-gray-950 pt-10 pb-16 text-gray-100">
-				<div className="px-44 flex justify-between items-start text-gray-400">
-					<div className="w-80 grid grid-cols-3 text-center">
+			<div className="footer  bg-gray-950 pt-10 pb-16 text-gray-100">
+				<div className="lg:px-44 md:grid grid-cols-4 lg:flex justify-between items-start text-gray-400">
+					<div className="w-80 col-span-4 grid grid-cols-3 text-center md:mx-auto">
 						<div className="col-span-3">
-							{/* <img src={brand} alt="Brand" className="w-20 h-20 mx-auto" /> */}
 							<h1 className="text-2xl">Shop Now</h1>
 						</div>
 						<h6 className="col-span-3 mt-1">
@@ -50,13 +57,13 @@ const Footer = () => {
 							esse, aliquam aliquid autem deserunt! Ut!
 						</h6>
 					</div>
-					<div>
+					<div className="col-span-2 md:mx-auto">
 						<h2 className="text-lg font-semibold">About RoboShoppp</h2>
 						<p>Contact Us</p>
 						<p>About Us</p>
 						<p>Terms and Conditions</p>
 					</div>
-					<div>
+					<div className="col-span-2 md:mx-auto">
 						<h2 className="text-lg font-semibold">About RoboShoppp</h2>
 						<p>Contact Us</p>
 						<p>About Us</p>
