@@ -12,7 +12,8 @@ const createCategoryController = async (req, res) => {
 		if (!category_name) {
 			return res.status(403).json({ message: "Category name must be provided!" })
 		}
-		const match = Category.findOne({ where: { category_name } })
+		const match = await Category.findOne({ where: { category_name } })
+
 		if (match) {
 			return res.status(201).json({ message: "Category exists!" })
 		} else {
