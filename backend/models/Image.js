@@ -1,9 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
 	const Image = sequelize.define("Image", {
-		image: {
-			type: DataTypes.BLOB("long"),
-			allowNull: false
-		}
+		filename: DataTypes.STRING, // Store the file name
+		filePath: DataTypes.STRING // Store the file path on the server
 	})
 
 	Image.associate = (models) => {
