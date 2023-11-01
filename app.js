@@ -8,20 +8,15 @@ const app = express()
 const db = require("./models")
 
 app.use(express.json())
-app.use(cors())
+app.use(
+	cors({
+		origin: "http://localhost:5173",
+		credentials: true
+	})
+)
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
-
-// app.use(
-// formidable({
-// 	encoding: "utf-8",
-// 	uploadDir: "/uploads",
-// 	keepExtensions: true,
-// 	maxFileSize: 10 * 1024 * 1024, // 10MB
-// 	multiples: true
-// })
-// )
 
 //Routers
 const UserRouter = require("./routes/Users")
@@ -44,3 +39,8 @@ db.sequelize.sync({ alter: true }).then(() => {
 })
 
 // console.log(process.env.NODE_ENV)
+
+// app.use(cors({
+//     origin: ['http://localhost:5173', 'http://example.com', 'http://another-domain.com'],
+//     credentials: true,
+//   }));

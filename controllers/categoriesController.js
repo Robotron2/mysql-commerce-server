@@ -2,7 +2,9 @@ const { Category } = require("../models")
 
 const getAllCategoriesController = async (req, res) => {
 	//
-	const allCategories = await Category.findAll()
+	const allCategories = await Category.findAll({
+		attributes: ["id", ["category_name", "categoryName"]]
+	})
 	res.status(200).json(allCategories)
 }
 
