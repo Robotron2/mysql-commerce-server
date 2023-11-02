@@ -12,10 +12,7 @@ const createProductController = async (req, res) => {
 	// const { product_name, description, price, stock_quantity, categoryId, image } = req.body
 	const { product_name, description, price, stock_quantity, categoryId } = req.body
 	let { originalname, path } = req.file
-	console.log(req.file === undefined)
-	if (req.file === undefined) {
-		throw Error("All fields must be provided!")
-	}
+
 	try {
 		if (!product_name || !description | !price || !stock_quantity || !categoryId) {
 			throw Error("All fields must be provided!")
@@ -105,7 +102,7 @@ const getAllProductsController = async (req, res) => {
 			]
 		})
 
-		res.json({
+		return res.status(200).json({
 			products: products.rows,
 			totalPages: Math.ceil(products.count / limit)
 		})
