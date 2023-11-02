@@ -17,6 +17,7 @@ app.use(
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
+app.use("/public", express.static("public", { maxAge: 31536000 }))
 
 //Routers
 const UserRouter = require("./routes/Users")
