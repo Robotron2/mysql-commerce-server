@@ -1,7 +1,7 @@
 const express = require("express")
 const router = express.Router()
 
-const { createProductController, getAllProductsController } = require("../controllers/productsController")
+const { createProductController, getAllProductsController, getSingleProductController } = require("../controllers/productsController")
 const multer = require("multer")
 
 const multerStorage = multer.diskStorage({
@@ -36,7 +36,9 @@ router.post("/create-product", upload.single("image"), createProductController)
 
 //getAll products
 router.get("/", getAllProductsController)
+
 //getSingle product
+router.get("/product/:id", getSingleProductController)
 
 //update product detail
 

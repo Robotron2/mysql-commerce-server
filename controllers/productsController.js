@@ -44,31 +44,7 @@ const createProductController = async (req, res) => {
 	// console.log(originalname)
 }
 
-// const getAllProductsController = async (req, res) => {
-// 	try {
-// 		const allProducts = await Product.findAll({
-// 			attributes: ["id", ["product_name", "productName"], ["stock_quantity", "stockQuantity"]],
-// include: [
-// 	{
-// 		model: Category,
-// 		attributes: [["category_name", "categoryName"]]
-// 	},
-// 	{
-// 		model: Image,
-// 		attributes: [["filename", "fileName"], "filePath"]
-// 	}
-// ]
-// 		})
 
-// 		if (!allProducts) {
-// 			return res.status(404).json({ error: "Products not found", success: false })
-// 		}
-
-// 		return res.status(200).json({ products: allProducts, success: true })
-// 	} catch (error) {
-// 		res.status(500).json({ error: error.message, success: false })
-// 	}
-// }
 const getAllProductsController = async (req, res) => {
 	const page = req.query.page || 1
 	const limit = 10
@@ -111,7 +87,32 @@ const getAllProductsController = async (req, res) => {
 	}
 }
 
+const getSingleProductController = async(req, res)=>{
+	const {id} = req.params
+	try {
+		const product = await Product.findByPk(id, {
+			attributes: [ ["product_name", "productName"],"description","price",["stock_quantity", "stockQuantity"]],
+			include: [
+				{
+					model: Image,
+					attributes: [["filename", "fileName"], "filePath"]
+				}
+			]
+		  })
+		if (!product) {
+			return res.status(404).json({error:"Product not found!", success:false})
+		}
+		return res.status(200).json({success:true, product:product})
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({error:"Something went wrong on the server."})
+	}
+}
+
+
+
 module.exports = {
 	createProductController,
-	getAllProductsController
+	getAllProductsController,
+	getSingleProductController
 }

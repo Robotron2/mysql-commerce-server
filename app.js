@@ -33,7 +33,12 @@ app.use("/category", CategoryRouter)
 // 		console.log("Server running on port 4000")
 // 	})
 // })
-db.sequelize.sync({ alter: true }).then(() => {
+// db.sequelize.sync({ alter: true }).then(() => {
+// 	app.listen(4000, () => {
+// 		console.log("Server running on port 4000")
+// 	})
+// })
+db.sequelize.sync().then(() => {
 	app.listen(4000, () => {
 		console.log("Server running on port 4000")
 	})
