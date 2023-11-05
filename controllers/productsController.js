@@ -12,7 +12,8 @@ const createProductController = async (req, res) => {
 	// const { product_name, description, price, stock_quantity, categoryId, image } = req.body
 	const { product_name, description, price, stock_quantity, categoryId } =
 		req.body
-	let { originalname, path } = req.file
+	let { filename, path } = req.file
+	// console.log(filename.slice(6))
 
 	try {
 		if (
@@ -36,7 +37,7 @@ const createProductController = async (req, res) => {
 
 		// console.log(productId)
 		await Image.create({
-			filename: originalname,
+			filename: filename.slice(6),
 			filePath: path,
 			ProductId: productId,
 		})
@@ -187,27 +188,37 @@ const deleteProductController = async (req, res) => {
 				},
 			],
 		})
+		const imageId = product.Image.id
 
 		if (!product) {
 			return res.status(404).json({ error: "Product not found" })
 		}
-		// console.log(product.Image)
-		// const imageFileName = product.Image.filename
-		// const imagePath = "public\files" + imageFileName
-		const imagePath = product.Image.filePath
+		// // console.log(product.Image)
 
-		// Delete the image file
-		if (fs.existsSync(imagePath)) {
-			fs.unlinkSync(imagePath)
-			// console.log("Deleted image")
+		const imageName = product.Image.filename
+
+		const image = await Image.findOne({ where: { id: imageId } })
+
+		if (image) {
+			// const image_path = path.join(__dirname, "public", "files", `${imageName}`)
+			const image_path = `public/files/${imageName}`
+			console.log(image_path)
+			console.log(fs.existsSync(image_path))
+
+			if (fs.existsSync(image_path)) {
+				fs.unlinkSync(image_path)
+				await image.destroy()
+				await product.destroy()
+				console.log("Deleted image")
+				return res
+					.status(200)
+					.json({ message: "Product deleted successfully", success: true })
+			}
+		} else {
+			return res
+				.status(500)
+				.json({ message: "Product not deleted", success: false })
 		}
-
-		// Delete the product
-		await product.destroy()
-
-		return res
-			.status(200)
-			.json({ message: "Product deleted successfully", success: true })
 	} catch (error) {
 		console.error(error)
 		return res.status(500).json({ error: "Internal server error" })
@@ -221,3 +232,47 @@ module.exports = {
 	updateSingleProductController,
 	deleteProductController,
 }
+
+// app.delete("/api/products/:productId", async (req, res) => {
+// 	try {
+// 		const { productId } = req.params
+// 		const product = await Product.findByPk(productId)
+
+// 		if (!product) {
+// 			return res.status(404).json({ error: "Product not found" })
+// 		}
+
+// 		// Retrieve the associated image identifier
+// 		const imageId = product.imageId
+
+// 		// Delete the product
+// 		await product.destroy()
+
+// 		if (imageId) {
+// 			// Use the imageId to locate and delete the image
+// 			const image = await Image.findOne({ where: { id: imageId } })
+// 			if (image) {
+// 				// Construct the file path using the image's unique identifier
+// 				const imagePath = path.join(
+// 					__dirname,
+// 					"public",
+// 					"images",
+// 					`${image.id}.jpg`
+// 				)
+
+// 				// Delete the image file from the server
+// 				fs.unlinkSync(imagePath)
+
+// 				// Delete the image record from the images table
+// 				await image.destroy()
+// 			}
+// 		}
+
+// 		return res
+// 			.status(200)
+// 			.json({ message: "Product and associated image deleted successfully" })
+// 	} catch (error) {
+// 		console.error(error)
+// 		return res.status(500).json({ error: "Internal server error" })
+// 	}
+// })
