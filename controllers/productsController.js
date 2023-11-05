@@ -55,7 +55,7 @@ const createProductController = async (req, res) => {
 
 const getAllProductsController = async (req, res) => {
 	const page = req.query.page || 1
-	const limit = 10
+	const limit = 12
 	const offset = (page - 1) * limit
 
 	const sortBy = req.query.sortBy || "createdAt"
@@ -77,6 +77,7 @@ const getAllProductsController = async (req, res) => {
 				"id",
 				["product_name", "productName"],
 				["stock_quantity", "stockQuantity"],
+				"description",
 				"price",
 			],
 			include: [
@@ -175,9 +176,48 @@ const updateSingleProductController = async (req, res) => {
 	}
 }
 
+const deleteProductController = async (req, res) => {
+	try {
+		const { id } = req.params
+
+		const product = await Product.findByPk(id, {
+			include: [
+				{
+					model: Image,
+				},
+			],
+		})
+
+		if (!product) {
+			return res.status(404).json({ error: "Product not found" })
+		}
+		// console.log(product.Image)
+		// const imageFileName = product.Image.filename
+		// const imagePath = "public\files" + imageFileName
+		const imagePath = product.Image.filePath
+
+		// Delete the image file
+		if (fs.existsSync(imagePath)) {
+			fs.unlinkSync(imagePath)
+			// console.log("Deleted image")
+		}
+
+		// Delete the product
+		await product.destroy()
+
+		return res
+			.status(200)
+			.json({ message: "Product deleted successfully", success: true })
+	} catch (error) {
+		console.error(error)
+		return res.status(500).json({ error: "Internal server error" })
+	}
+}
+
 module.exports = {
 	createProductController,
 	getAllProductsController,
 	getSingleProductController,
 	updateSingleProductController,
+	deleteProductController,
 }

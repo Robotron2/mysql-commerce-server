@@ -1,19 +1,6 @@
 const { User } = require("../models")
 const JWT = require("jsonwebtoken")
 
-// const requireSignIn = async (req, res, next) => {
-// 	try {
-// 		// console.log(req.headers)
-// 		const decode = JWT.verify(req.headers.authorization, process.env.JWT_SECRET)
-// 		// console.log(decode)
-// 		req.user = decode
-// 		next()
-// 	} catch (error) {
-// 		console.log(error)
-// 		res.status(403).json({ success: false, message: "You are not logged in!" })
-// 	}
-// }
-
 const requireSignIn = (req, res, next) => {
 	const accessToken = req.header("accessToken")
 	if (!accessToken) {
@@ -37,7 +24,7 @@ const isAdmin = async (req, res, next) => {
 		if (user.role !== 1) {
 			res.status(403).send({
 				success: false,
-				message: "You're not admnin!!"
+				message: "You're not admnin!!",
 			})
 		} else {
 			next()
@@ -49,5 +36,5 @@ const isAdmin = async (req, res, next) => {
 
 module.exports = {
 	requireSignIn,
-	isAdmin
+	isAdmin,
 }

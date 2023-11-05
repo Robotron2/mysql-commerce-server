@@ -1,8 +1,15 @@
 const express = require("express")
 const router = express.Router()
 
-const { createProductController, getAllProductsController, getSingleProductController, updateSingleProductController } = require("../controllers/productsController")
+const {
+	createProductController,
+	getAllProductsController,
+	getSingleProductController,
+	updateSingleProductController,
+	deleteProductController,
+} = require("../controllers/productsController")
 const multer = require("multer")
+const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
 
 const multerStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
@@ -11,7 +18,7 @@ const multerStorage = multer.diskStorage({
 	filename: (req, file, cb) => {
 		const ext = file.mimetype.split("/")[1]
 		cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`)
-	}
+	},
 })
 
 const multerFilter = (req, file, cb) => {
@@ -28,11 +35,17 @@ const multerFilter = (req, file, cb) => {
 
 const upload = multer({
 	storage: multerStorage,
-	fileFilter: multerFilter
+	fileFilter: multerFilter,
 })
 
 //create product
-router.post("/create-product", upload.single("image"), createProductController)
+router.post(
+	"/create-product",
+	requireSignIn,
+	isAdmin,
+	upload.single("image"),
+	createProductController
+)
 
 //getAll products
 router.get("/", getAllProductsController)
@@ -41,8 +54,15 @@ router.get("/", getAllProductsController)
 router.get("/product/:id", getSingleProductController)
 
 //update product detail
-router.put("/product/:id", upload.single("image"), updateSingleProductController)
+router.put(
+	"/product/:id",
+	requireSignIn,
+	isAdmin,
+	upload.single("image"),
+	updateSingleProductController
+)
 
 //delete product
+router.delete("/product/:id", requireSignIn, isAdmin, deleteProductController)
 
 module.exports = router
