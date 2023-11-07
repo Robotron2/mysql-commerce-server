@@ -1,5 +1,10 @@
 const express = require("express")
-const { registerUser, loginUser, resetPassword } = require("../controllers/userController")
+const {
+	registerUser,
+	loginUser,
+	resetPassword,
+	getUsersInfoController,
+} = require("../controllers/userController")
 const { requireSignIn, isAdmin } = require("../middlewares/authMididdleware")
 
 const router = express.Router()
