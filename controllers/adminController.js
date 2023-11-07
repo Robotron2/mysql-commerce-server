@@ -8,12 +8,8 @@ const getUsersInfoController = async (req, res) => {
 
 	const sortBy = req.query.sortBy || "createdAt"
 	const sortOrder = req.query.sortOrder || "asc"
-	const category = req.query.category
 
 	const where = {}
-	if (category) {
-		where.category = category
-	}
 
 	try {
 		const allUsers = await User.findAndCountAll({
@@ -46,7 +42,7 @@ const getUsersInfoController = async (req, res) => {
 			totalPages: Math.ceil(allUsers.count / limit),
 		})
 	} catch (error) {
-		res.status(500).json({ error: "Error fetching products." })
+		res.status(500).json({ error: "Error fetching users." })
 	}
 }
 
