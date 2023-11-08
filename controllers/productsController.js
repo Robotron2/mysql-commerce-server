@@ -1,7 +1,8 @@
-const { Product } = require("../models")
-const { Category } = require("../models")
-const { Image } = require("../models")
+const { Product, Category, Image } = require("../models")
+const { Op } = require("sequelize")
+
 const path = require("path")
+
 const fs = require("fs")
 
 function modifyFilePath(filePath) {
@@ -225,54 +226,48 @@ const deleteProductController = async (req, res) => {
 	}
 }
 
+///////////////////////////////////////////// Product Browsing Controllers /////////////////////////////////////////////
+
+const getProductsByFilterController = async (req, res) => {
+	const { category, minPrice, maxPrice, sort } = req.query
+	const where = {}
+	if (category) where.CategoryId = category
+	if (minPrice) where.price = { [Op.gte]: minPrice }
+	if (maxPrice) where.price = { ...where.price, [Op.lte]: maxPrice }
+
+	try {
+		const products = await Product.findAll({
+			where,
+			attributes: [
+				["product_name", "name"],
+				["stock_quantity", "quantity"],
+				"id",
+				"description",
+				"price",
+			],
+			include: [
+				{ model: Category, attributes: [["category_name", "category"], "id"] },
+				{ model: Image, attributes: ["filename", "filePath", "id"] },
+			],
+			order: sort ? [sort.split(",")] : [],
+		})
+		if (products.length === 0) {
+			return res
+				.status(200)
+				.json({ message: "No product matches this", success: false })
+		}
+		return res.status(200).json({ products: products, success: true })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ message: "Internal Server Error" })
+	}
+}
+
 module.exports = {
 	createProductController,
 	getAllProductsController,
 	getSingleProductController,
 	updateSingleProductController,
 	deleteProductController,
+	getProductsByFilterController,
 }
-
-// app.delete("/api/products/:productId", async (req, res) => {
-// 	try {
-// 		const { productId } = req.params
-// 		const product = await Product.findByPk(productId)
-
-// 		if (!product) {
-// 			return res.status(404).json({ error: "Product not found" })
-// 		}
-
-// 		// Retrieve the associated image identifier
-// 		const imageId = product.imageId
-
-// 		// Delete the product
-// 		await product.destroy()
-
-// 		if (imageId) {
-// 			// Use the imageId to locate and delete the image
-// 			const image = await Image.findOne({ where: { id: imageId } })
-// 			if (image) {
-// 				// Construct the file path using the image's unique identifier
-// 				const imagePath = path.join(
-// 					__dirname,
-// 					"public",
-// 					"images",
-// 					`${image.id}.jpg`
-// 				)
-
-// 				// Delete the image file from the server
-// 				fs.unlinkSync(imagePath)
-
-// 				// Delete the image record from the images table
-// 				await image.destroy()
-// 			}
-// 		}
-
-// 		return res
-// 			.status(200)
-// 			.json({ message: "Product and associated image deleted successfully" })
-// 	} catch (error) {
-// 		console.error(error)
-// 		return res.status(500).json({ error: "Internal server error" })
-// 	}
-// })

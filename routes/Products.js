@@ -7,6 +7,7 @@ const {
 	getSingleProductController,
 	updateSingleProductController,
 	deleteProductController,
+	getProductsByFilterController,
 } = require("../controllers/productsController")
 const multer = require("multer")
 const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
@@ -47,12 +48,6 @@ router.post(
 	createProductController
 )
 
-//getAll products
-router.get("/", getAllProductsController)
-
-//getSingle product
-router.get("/product/:id", getSingleProductController)
-
 //update product detail
 router.put(
 	"/product/:id",
@@ -64,5 +59,14 @@ router.put(
 
 //delete product
 router.delete("/product/:id", requireSignIn, isAdmin, deleteProductController)
+
+///////////////////////////////////////////// Product Browsing Routes /////////////////////////////////////////////
+//getAll products
+router.get("/", getAllProductsController)
+
+//getSingle product
+router.get("/product/:id", getSingleProductController)
+
+router.get("/filter", getProductsByFilterController)
 
 module.exports = router
