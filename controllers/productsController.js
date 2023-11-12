@@ -57,7 +57,7 @@ const createProductController = async (req, res) => {
 
 const getAllProductsController = async (req, res) => {
 	const page = req.query.page || 1
-	const limit = 12
+	const limit = parseInt(req.query.limit) || 12
 	const offset = (page - 1) * limit
 
 	const sortBy = req.query.sortBy || "createdAt"
@@ -103,8 +103,35 @@ const getAllProductsController = async (req, res) => {
 	}
 }
 
+const getRelatedProductsController = async (categoryId) => {
+	console.log(categoryId)
+	const relatedProducts = await Product.findAll({
+		where: {
+			CategoryId: categoryId,
+		},
+		attributes: [
+			["product_name", "productName"],
+			["stock_quantity", "stockQuantity"],
+			"id",
+			"description",
+			"price",
+		],
+		include: [
+			{
+				model: Category,
+				attributes: [["category_name", "categoryName"], "id"],
+			},
+			{ model: Image, attributes: ["filename", "filePath", "id"] },
+		],
+	})
+
+	return relatedProducts
+}
+
 const getSingleProductController = async (req, res) => {
 	const { id } = req.params
+	const productCategory = parseInt(req.query.category)
+
 	try {
 		const product = await Product.findByPk(id, {
 			attributes: [
@@ -118,6 +145,10 @@ const getSingleProductController = async (req, res) => {
 					model: Image,
 					attributes: [["filename", "fileName"], "filePath"],
 				},
+				{
+					model: Category,
+					attributes: [["category_name", "categoryName"], "id"],
+				},
 			],
 		})
 		if (!product) {
@@ -125,7 +156,16 @@ const getSingleProductController = async (req, res) => {
 				.status(404)
 				.json({ error: "Product not found!", success: false })
 		}
-		return res.status(200).json({ success: true, product: product })
+		let relatedProducts
+		if (productCategory) {
+			relatedProducts = await getRelatedProductsController(productCategory)
+		}
+
+		return res.status(200).json({
+			success: true,
+			product: product,
+			relatedProducts: relatedProducts,
+		})
 	} catch (error) {
 		console.log(error)
 		res.status(500).json({ error: "Something went wrong on the server." })
@@ -239,14 +279,17 @@ const getProductsByFilterController = async (req, res) => {
 		const products = await Product.findAll({
 			where,
 			attributes: [
-				["product_name", "name"],
-				["stock_quantity", "quantity"],
+				["product_name", "productName"],
+				["stock_quantity", "stockQuantity"],
 				"id",
 				"description",
 				"price",
 			],
 			include: [
-				{ model: Category, attributes: [["category_name", "category"], "id"] },
+				{
+					model: Category,
+					attributes: [["category_name", "categoryName"], "id"],
+				},
 				{ model: Image, attributes: ["filename", "filePath", "id"] },
 			],
 			order: sort ? [sort.split(",")] : [],
@@ -254,7 +297,7 @@ const getProductsByFilterController = async (req, res) => {
 		if (products.length === 0) {
 			return res
 				.status(200)
-				.json({ message: "No product matches this", success: false })
+				.json({ message: "No product matches this", success: false, products })
 		}
 		return res.status(200).json({ products: products, success: true })
 	} catch (error) {

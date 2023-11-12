@@ -8,6 +8,7 @@ const {
 	updateSingleProductController,
 	deleteProductController,
 	getProductsByFilterController,
+	getRelatedProductsController,
 } = require("../controllers/productsController")
 const multer = require("multer")
 const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
@@ -47,7 +48,6 @@ router.post(
 	upload.single("image"),
 	createProductController
 )
-
 //update product detail
 router.put(
 	"/product/:id",
@@ -56,7 +56,6 @@ router.put(
 	upload.single("image"),
 	updateSingleProductController
 )
-
 //delete product
 router.delete("/product/:id", requireSignIn, isAdmin, deleteProductController)
 
