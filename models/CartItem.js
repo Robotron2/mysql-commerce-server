@@ -2,12 +2,12 @@ module.exports = (sequelize, DataTypes) => {
 	const CartItem = sequelize.define("CartItem", {
 		quantity: {
 			type: DataTypes.INTEGER,
-			allowNull: false
+			allowNull: false,
 		},
 		price: {
 			type: DataTypes.FLOAT,
-			allowNull: false
-		}
+			allowNull: false,
+		},
 	})
 
 	CartItem.associate = (models) => {
