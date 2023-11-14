@@ -59,10 +59,30 @@ const addToCartController = async (req, res) => {
 		}
 	} catch (error) {
 		console.error(error)
-		res.status(500).json({ error: "Failed to add the product to the cart." })
+		res.status(500).json({ error: error.message, success: false })
 	}
 }
-const updateCartItemQuantity = () => {}
+const updateCartItemQuantity = async (req, res) => {
+	try {
+		const { cartItemId, quantity } = req.body
+
+		const cartItem = await CartItem.findOne({
+			where: { id: cartItemId },
+		})
+
+		if (!cartItem) {
+			return res.status(404).json({ error: "Cart item not found" })
+		}
+
+		cartItem.quantity = parseInt(quantity)
+		await cartItem.save()
+
+		res.status(200).json(cartItem)
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ error: error.message, success: false })
+	}
+}
 const removeCartItemController = () => {}
 const getCartTotalController = () => {}
 
