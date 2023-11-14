@@ -83,8 +83,59 @@ const updateCartItemQuantity = async (req, res) => {
 		res.status(500).json({ error: error.message, success: false })
 	}
 }
-const removeCartItemController = () => {}
-const getCartTotalController = () => {}
+const removeCartItemController = async (req, res) => {
+	try {
+		const { cartItemId } = req.body
+
+		const cartItem = await CartItem.findOne({
+			where: { id: cartItemId },
+		})
+
+		if (!cartItem) {
+			return res
+				.status(404)
+				.json({ error: "Cart item not found", success: false })
+		}
+
+		console.log(cartItem)
+		// await cartItem.destroy()
+
+		res.status(204).end()
+	} catch (error) {
+		console.error(error)
+		res
+			.status(500)
+			.json({ error: "Failed to remove cart item.", success: false })
+	}
+}
+const getCartTotalController = async (req, res) => {
+	try {
+		const cart = await Cart.findOne({
+			where: { UserId: req.user.id },
+			attributes: ["id", "UserId"],
+			include: [
+				{
+					model: CartItem,
+					attributes: ["id", "quantity", "price", "CartId", "ProductId"],
+				},
+			],
+		})
+
+		if (!cart) {
+			return res.status(404).json({ error: "Cart not found" })
+		}
+
+		let totalValue = 0
+		cart.CartItems.forEach((cartItem) => {
+			totalValue += cartItem.quantity * cartItem.price
+		})
+
+		res.status(200).json({ cart, totalValue })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ error: "Failed to fetch the user's cart." })
+	}
+}
 
 module.exports = {
 	findOrCreateCartController,
