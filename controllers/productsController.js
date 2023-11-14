@@ -130,11 +130,12 @@ const getRelatedProductsController = async (categoryId) => {
 
 const getSingleProductController = async (req, res) => {
 	const { id } = req.params
-	const productCategory = parseInt(req.query.category)
+	const productCategory = req.query.category
 
 	try {
 		const product = await Product.findByPk(id, {
 			attributes: [
+				"id",
 				["product_name", "productName"],
 				"description",
 				"price",
@@ -156,9 +157,10 @@ const getSingleProductController = async (req, res) => {
 				.status(404)
 				.json({ error: "Product not found!", success: false })
 		}
+
 		let relatedProducts
 		if (productCategory) {
-			relatedProducts = await getRelatedProductsController(productCategory)
+			relatedProducts = await getRelatedProductsController(product.Category.id)
 		}
 
 		return res.status(200).json({

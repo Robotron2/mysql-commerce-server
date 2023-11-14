@@ -24,12 +24,14 @@ const UserRouter = require("./routes/Users")
 const ProfileRouter = require("./routes/Profiles")
 const ProductRouter = require("./routes/Products")
 const CategoryRouter = require("./routes/Category")
+const CartsRouter = require("./routes/Carts")
 const AdminRouter = require("./routes/Admin")
 
 app.use("/auth/user", UserRouter)
 app.use("/admin", AdminRouter)
 app.use("/products", ProductRouter)
 app.use("/category", CategoryRouter)
+app.use("/carts", CartsRouter)
 app.use("/profile", ProfileRouter)
 
 // db.sequelize.sync({ alter: true, force: true }).then(() => {
