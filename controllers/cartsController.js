@@ -1,4 +1,4 @@
-const { Cart, CartItem, Product } = require("../models")
+const { Cart, CartItem, Product, Image } = require("../models")
 
 // Create a new cart or get an existing one
 const findOrCreateCartController = async (req, res) => {
@@ -19,7 +19,7 @@ const findOrCreateCartController = async (req, res) => {
 			attributes: ["id", "UserId"],
 		})
 
-		res.status(200).json(cart)
+		res.status(200).json({ cart: cart, success: true })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: "Failed to create or fetch the cart." })
@@ -41,7 +41,7 @@ const addToCartController = async (req, res) => {
 		if (existingCartItem) {
 			existingCartItem.quantity += quantity
 			await existingCartItem.save()
-			res.status(200).json(existingCartItem)
+			res.status(200).json({ existingCartItem, success: true })
 		} else {
 			const product = await Product.findByPk(productId, {
 				attributes: ["id", "price"],
@@ -55,7 +55,7 @@ const addToCartController = async (req, res) => {
 				quantity: parseInt(quantity),
 				price: product.price,
 			})
-			res.status(200).json(cartItem)
+			res.status(200).json({ cartItem, success: true })
 		}
 	} catch (error) {
 		console.error(error)
@@ -112,11 +112,29 @@ const getCartTotalController = async (req, res) => {
 	try {
 		const cart = await Cart.findOne({
 			where: { UserId: req.user.id },
-			attributes: ["id", "UserId"],
+			attributes: [["id", "cartId"], "UserId"],
 			include: [
 				{
 					model: CartItem,
-					attributes: ["id", "quantity", "price", "CartId", "ProductId"],
+					attributes: [
+						["id", "cartItemId"],
+						"quantity",
+						"price",
+						"CartId",
+						"ProductId",
+					],
+					include: [
+						{
+							model: Product,
+							attributes: [["product_name", "productName"]],
+							include: [
+								{
+									model: Image,
+									attributes: ["filename", "filePath"],
+								},
+							],
+						},
+					],
 				},
 			],
 		})
@@ -130,7 +148,7 @@ const getCartTotalController = async (req, res) => {
 			totalValue += cartItem.quantity * cartItem.price
 		})
 
-		res.status(200).json({ cart, totalValue })
+		res.status(200).json({ cart, totalValue, success: true })
 	} catch (error) {
 		console.error(error)
 		res.status(500).json({ error: "Failed to fetch the user's cart." })
