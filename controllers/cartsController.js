@@ -85,7 +85,7 @@ const updateCartItemQuantity = async (req, res) => {
 }
 const removeCartItemController = async (req, res) => {
 	try {
-		const { cartItemId } = req.body
+		const { cartItemId } = req.params
 
 		const cartItem = await CartItem.findOne({
 			where: { id: cartItemId },
@@ -97,8 +97,8 @@ const removeCartItemController = async (req, res) => {
 				.json({ error: "Cart item not found", success: false })
 		}
 
-		console.log(cartItem)
-		// await cartItem.destroy()
+		// console.log(cartItem)
+		await cartItem.destroy()
 
 		res.status(204).end()
 	} catch (error) {

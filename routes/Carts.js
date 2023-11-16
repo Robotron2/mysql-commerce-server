@@ -19,7 +19,7 @@ router.post("/add", requireSignIn, addToCartController)
 router.put("/update", requireSignIn, updateCartItemQuantity)
 
 //remove cart_item
-router.delete("/remove", requireSignIn, removeCartItemController)
+router.delete("/remove/:cartItemId", requireSignIn, removeCartItemController)
 
 router.get("/total", requireSignIn, getCartTotalController)
 
