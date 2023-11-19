@@ -9,6 +9,7 @@ const {
 	deleteProductController,
 	getProductsByFilterController,
 	getRelatedProductsController,
+	searchProduct,
 } = require("../controllers/productsController")
 const multer = require("multer")
 const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
@@ -67,5 +68,8 @@ router.get("/", getAllProductsController)
 router.get("/product/:id", getSingleProductController)
 
 router.get("/filter", getProductsByFilterController)
+
+// Search products by name and category
+router.get("/search", searchProduct)
 
 module.exports = router

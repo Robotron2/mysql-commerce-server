@@ -39,7 +39,7 @@ const addToCartController = async (req, res) => {
 		})
 
 		if (existingCartItem) {
-			existingCartItem.quantity += quantity
+			existingCartItem.quantity = quantity
 			await existingCartItem.save()
 			res.status(200).json({ existingCartItem, success: true })
 		} else {

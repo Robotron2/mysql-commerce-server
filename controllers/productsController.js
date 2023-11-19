@@ -308,6 +308,69 @@ const getProductsByFilterController = async (req, res) => {
 	}
 }
 
+const searchProduct = async (req, res) => {
+	const { keyword } = req.query
+
+	try {
+		const products = await Product.findAll({
+			where: {
+				[Op.or]: [
+					{ product_name: { [Op.like]: `%${keyword}%` } },
+					{ "$Category.category_name$": { [Op.like]: `%${keyword}%` } },
+				],
+			},
+			attributes: [
+				"id",
+				["product_name", "productName"],
+				["stock_quantity", "stockQuantity"],
+			],
+			include: [
+				{
+					model: Category,
+					attributes: [["category_name", "categoryName"]],
+				},
+				{
+					model: Image,
+					attributes: [["filename", "fileName"], "filePath"],
+				},
+			],
+		})
+
+		res.json({ products })
+	} catch (error) {
+		console.error(error)
+		res.status(500).json({ error: "Internal Server Error" })
+	}
+}
+
+// const dynamicSearch = async (req, res) => {
+// 	const { keyword, category } = req.query
+
+// 	try {
+// 		const searchCriteria = {}
+
+// 		// Conditionally include name search
+// 		if (keyword) {
+// 			searchCriteria.productName = { [Op.like]: `%${keyword}%` }
+// 		}
+
+// 		// Conditionally include category search
+// 		if (category) {
+// 			searchCriteria["$Category.categoryName$"] = { [Op.like]: `%${category}%` }
+// 		}
+
+// 		const products = await Product.findAll({
+// 			where: searchCriteria,
+// 			include: [{ model: Category }],
+// 		})
+
+// 		res.json({ products })
+// 	} catch (error) {
+// 		console.error(error)
+// 		res.status(500).json({ error: "Internal Server Error" })
+// 	}
+// }
+
 module.exports = {
 	createProductController,
 	getAllProductsController,
@@ -315,4 +378,5 @@ module.exports = {
 	updateSingleProductController,
 	deleteProductController,
 	getProductsByFilterController,
+	searchProduct,
 }
