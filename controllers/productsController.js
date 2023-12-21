@@ -47,7 +47,7 @@ const createProductController = async (req, res) => {
 			success: true,
 		})
 	} catch (error) {
-		console.error(error)
+		// console.error(error)
 		res.status(500).json({ error: error.message, success: false })
 	}
 
@@ -131,7 +131,8 @@ const getRelatedProductsController = async (categoryId) => {
 const getSingleProductController = async (req, res) => {
 	const { id } = req.params
 	const productCategory = req.query.category
-
+	let isAvailable = true
+	let relatedProducts
 	try {
 		const product = await Product.findByPk(id, {
 			attributes: [
@@ -157,8 +158,11 @@ const getSingleProductController = async (req, res) => {
 				.status(404)
 				.json({ error: "Product not found!", success: false })
 		}
+		// console.log(product.toJSON().stockQuantity)
+		if (product.toJSON().stockQuantity < 1) {
+			isAvailable = false
+		}
 
-		let relatedProducts
 		if (productCategory) {
 			relatedProducts = await getRelatedProductsController(product.Category.id)
 		}
@@ -166,10 +170,11 @@ const getSingleProductController = async (req, res) => {
 		return res.status(200).json({
 			success: true,
 			product: product,
-			relatedProducts: relatedProducts,
+			relatedProducts,
+			isAvailable,
 		})
 	} catch (error) {
-		console.log(error)
+		// console.log(error)
 		res.status(500).json({ error: "Something went wrong on the server." })
 	}
 }
@@ -211,7 +216,7 @@ const updateSingleProductController = async (req, res) => {
 			.status(200)
 			.json({ success: true, message: "Product updated successfully" })
 	} catch (error) {
-		console.log(error)
+		// console.log(error)
 		return res.status(500).json({
 			success: false,
 			message: "Error updating product.",
@@ -263,7 +268,7 @@ const deleteProductController = async (req, res) => {
 				.json({ message: "Product not deleted", success: false })
 		}
 	} catch (error) {
-		console.error(error)
+		// console.error(error)
 		return res.status(500).json({ error: "Internal server error" })
 	}
 }
@@ -303,7 +308,7 @@ const getProductsByFilterController = async (req, res) => {
 		}
 		return res.status(200).json({ products: products, success: true })
 	} catch (error) {
-		console.error(error)
+		// console.error(error)
 		res.status(500).json({ message: "Internal Server Error" })
 	}
 }
@@ -339,38 +344,10 @@ const searchProduct = async (req, res) => {
 
 		res.json({ products })
 	} catch (error) {
-		console.error(error)
+		// console.error(error)
 		res.status(500).json({ error: "Internal Server Error" })
 	}
 }
-
-// const dynamicSearch = async (req, res) => {
-// 	const { keyword, category } = req.query
-
-// 	try {
-// 		const searchCriteria = {}
-
-// 		// Conditionally include name search
-// 		if (keyword) {
-// 			searchCriteria.productName = { [Op.like]: `%${keyword}%` }
-// 		}
-
-// 		// Conditionally include category search
-// 		if (category) {
-// 			searchCriteria["$Category.categoryName$"] = { [Op.like]: `%${category}%` }
-// 		}
-
-// 		const products = await Product.findAll({
-// 			where: searchCriteria,
-// 			include: [{ model: Category }],
-// 		})
-
-// 		res.json({ products })
-// 	} catch (error) {
-// 		console.error(error)
-// 		res.status(500).json({ error: "Internal Server Error" })
-// 	}
-// }
 
 module.exports = {
 	createProductController,
