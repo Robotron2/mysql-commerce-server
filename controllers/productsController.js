@@ -323,6 +323,7 @@ const searchProduct = async (req, res) => {
 				"id",
 				["product_name", "productName"],
 				["stock_quantity", "stockQuantity"],
+				"price",
 			],
 			include: [
 				{

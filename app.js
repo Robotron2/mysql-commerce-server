@@ -11,7 +11,7 @@ app.use(express.json())
 app.use(
 	cors({
 		origin: ["http://localhost:5173", "http://192.168.43.166:5173"],
-		credentials: true,
+		// credentials: true,
 	})
 )
 app.use(morgan("dev"))
