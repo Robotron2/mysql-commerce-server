@@ -378,7 +378,7 @@ const getProductsByCategoryController = async (req, res) => {
 		})
 		if (products.length < 1) {
 			return res.status(200).json({
-				success: true,
+				success: false,
 				message: "No product in this category",
 				products,
 			})

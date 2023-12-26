@@ -3,16 +3,18 @@ const { Category } = require("../models")
 const getAllCategoriesController = async (req, res) => {
 	//
 	const allCategories = await Category.findAll({
-		attributes: ["id", ["category_name", "categoryName"]]
+		attributes: ["id", ["category_name", "categoryName"]],
 	})
-	res.status(200).json(allCategories)
+	res.status(200).json({ allCategories, success: true })
 }
 
 const createCategoryController = async (req, res) => {
 	const { category_name } = req.body
 	try {
 		if (!category_name) {
-			return res.status(403).json({ message: "Category name must be provided!" })
+			return res
+				.status(403)
+				.json({ message: "Category name must be provided!" })
 		}
 		const match = await Category.findOne({ where: { category_name } })
 
@@ -30,5 +32,5 @@ const createCategoryController = async (req, res) => {
 
 module.exports = {
 	getAllCategoriesController,
-	createCategoryController
+	createCategoryController,
 }
