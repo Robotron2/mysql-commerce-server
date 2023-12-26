@@ -104,7 +104,7 @@ const getAllProductsController = async (req, res) => {
 }
 
 const getRelatedProductsController = async (categoryId) => {
-	console.log(categoryId)
+	// console.log(categoryId)
 	const relatedProducts = await Product.findAll({
 		where: {
 			CategoryId: categoryId,
@@ -349,6 +349,54 @@ const searchProduct = async (req, res) => {
 	}
 }
 
+const getProductsByCategoryController = async (req, res) => {
+	const { id } = req.query
+
+	try {
+		if (!id || isNaN(id)) {
+			throw Error("Please provide a valid id")
+		}
+
+		const products = await Product.findAll({
+			where: {
+				CategoryId: id,
+			},
+			attributes: [
+				["product_name", "productName"],
+				["stock_quantity", "stockQuantity"],
+				"id",
+				"description",
+				"price",
+			],
+			include: [
+				{
+					model: Category,
+					attributes: [["category_name", "categoryName"], "id"],
+				},
+				{ model: Image, attributes: ["filename", "filePath", "id"] },
+			],
+		})
+		if (products.length < 1) {
+			return res.status(200).json({
+				success: true,
+				message: "No product in this category",
+				products,
+			})
+		}
+
+		return res.status(200).json({
+			success: true,
+			products,
+		})
+	} catch (error) {
+		console.log(error)
+		res.status(500).json({
+			error: error.message,
+			success: false,
+		})
+	}
+}
+
 module.exports = {
 	createProductController,
 	getAllProductsController,
@@ -357,4 +405,5 @@ module.exports = {
 	deleteProductController,
 	getProductsByFilterController,
 	searchProduct,
+	getProductsByCategoryController,
 }
