@@ -13,9 +13,6 @@
 		"API",
 		"E-Commerce"
 	],
-	"engines": {
-		"node": "20.9.0" 
-	   },
 	"author": "Theophilus",
 	"license": "MIT",
 	"dependencies": {
