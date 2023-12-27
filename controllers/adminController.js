@@ -17,14 +17,7 @@ const getUsersInfoController = async (req, res) => {
 			offset,
 			where,
 			order: [[sortBy, sortOrder]],
-			attributes: [
-				"id",
-				["full_name", "fullName"],
-				"username",
-				"email",
-				"address",
-				["phone_number", "phone"],
-			],
+			attributes: ["id", ["full_name", "fullName"], "username", "email", "address", ["phone_number", "phone"]],
 			// include: [
 			// 	{
 			// 		model: Category,

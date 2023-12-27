@@ -10,19 +10,12 @@ function modifyFilePath(filePath) {
 }
 
 const createProductController = async (req, res) => {
-	// const { product_name, description, price, stock_quantity, categoryId, image } = req.body
-	const { product_name, description, price, stock_quantity, categoryId } =
-		req.body
+	const { product_name, description, price, stock_quantity, categoryId } = req.body
 	let { filename, path } = req.file
 	// console.log(filename.slice(6))
 
 	try {
-		if (
-			!product_name ||
-			!description | !price ||
-			!stock_quantity ||
-			!categoryId
-		) {
+		if (!product_name || !description | !price || !stock_quantity || !categoryId) {
 			throw Error("All fields must be provided!")
 		}
 		path = modifyFilePath(path)
@@ -75,13 +68,7 @@ const getAllProductsController = async (req, res) => {
 			offset,
 			where,
 			order: [[sortBy, sortOrder]],
-			attributes: [
-				"id",
-				["product_name", "productName"],
-				["stock_quantity", "stockQuantity"],
-				"description",
-				"price",
-			],
+			attributes: ["id", ["product_name", "productName"], ["stock_quantity", "stockQuantity"], "description", "price"],
 			include: [
 				{
 					model: Category,
@@ -109,13 +96,7 @@ const getRelatedProductsController = async (categoryId) => {
 		where: {
 			CategoryId: categoryId,
 		},
-		attributes: [
-			["product_name", "productName"],
-			["stock_quantity", "stockQuantity"],
-			"id",
-			"description",
-			"price",
-		],
+		attributes: [["product_name", "productName"], ["stock_quantity", "stockQuantity"], "id", "description", "price"],
 		include: [
 			{
 				model: Category,
@@ -135,13 +116,7 @@ const getSingleProductController = async (req, res) => {
 	let relatedProducts
 	try {
 		const product = await Product.findByPk(id, {
-			attributes: [
-				"id",
-				["product_name", "productName"],
-				"description",
-				"price",
-				["stock_quantity", "stockQuantity"],
-			],
+			attributes: ["id", ["product_name", "productName"], "description", "price", ["stock_quantity", "stockQuantity"]],
 			include: [
 				{
 					model: Image,
@@ -154,9 +129,7 @@ const getSingleProductController = async (req, res) => {
 			],
 		})
 		if (!product) {
-			return res
-				.status(404)
-				.json({ error: "Product not found!", success: false })
+			return res.status(404).json({ error: "Product not found!", success: false })
 		}
 		// console.log(product.toJSON().stockQuantity)
 		if (product.toJSON().stockQuantity < 1) {
@@ -175,15 +148,16 @@ const getSingleProductController = async (req, res) => {
 		})
 	} catch (error) {
 		// console.log(error)
-		res.status(500).json({ error: "Something went wrong on the server." })
+		res.status(500).json({
+			error: "Something went wrong on the server.",
+		})
 	}
 }
 
 const updateSingleProductController = async (req, res) => {
 	const { id } = req.params
 	try {
-		const { product_name, description, price, stock_quantity, updateImage } =
-			req.body
+		const { product_name, description, price, stock_quantity, updateImage } = req.body
 
 		const updatedProductData = {
 			product_name,
@@ -212,9 +186,10 @@ const updateSingleProductController = async (req, res) => {
 		}
 		await product.update(updatedProductData)
 
-		return res
-			.status(200)
-			.json({ success: true, message: "Product updated successfully" })
+		return res.status(200).json({
+			success: true,
+			message: "Product updated successfully",
+		})
 	} catch (error) {
 		// console.log(error)
 		return res.status(500).json({
@@ -258,14 +233,13 @@ const deleteProductController = async (req, res) => {
 				await image.destroy()
 				await product.destroy()
 				console.log("Deleted image")
-				return res
-					.status(200)
-					.json({ message: "Product deleted successfully", success: true })
+				return res.status(200).json({
+					message: "Product deleted successfully",
+					success: true,
+				})
 			}
 		} else {
-			return res
-				.status(500)
-				.json({ message: "Product not deleted", success: false })
+			return res.status(500).json({ message: "Product not deleted", success: false })
 		}
 	} catch (error) {
 		// console.error(error)
@@ -285,26 +259,25 @@ const getProductsByFilterController = async (req, res) => {
 	try {
 		const products = await Product.findAll({
 			where,
-			attributes: [
-				["product_name", "productName"],
-				["stock_quantity", "stockQuantity"],
-				"id",
-				"description",
-				"price",
-			],
+			attributes: [["product_name", "productName"], ["stock_quantity", "stockQuantity"], "id", "description", "price"],
 			include: [
 				{
 					model: Category,
 					attributes: [["category_name", "categoryName"], "id"],
 				},
-				{ model: Image, attributes: ["filename", "filePath", "id"] },
+				{
+					model: Image,
+					attributes: ["filename", "filePath", "id"],
+				},
 			],
 			order: sort ? [sort.split(",")] : [],
 		})
 		if (products.length === 0) {
-			return res
-				.status(200)
-				.json({ message: "No product matches this", success: false, products })
+			return res.status(200).json({
+				message: "No product matches this",
+				success: false,
+				products,
+			})
 		}
 		return res.status(200).json({ products: products, success: true })
 	} catch (error) {
@@ -321,15 +294,14 @@ const searchProduct = async (req, res) => {
 			where: {
 				[Op.or]: [
 					{ product_name: { [Op.like]: `%${keyword}%` } },
-					{ "$Category.category_name$": { [Op.like]: `%${keyword}%` } },
+					{
+						"$Category.category_name$": {
+							[Op.like]: `%${keyword}%`,
+						},
+					},
 				],
 			},
-			attributes: [
-				"id",
-				["product_name", "productName"],
-				["stock_quantity", "stockQuantity"],
-				"price",
-			],
+			attributes: ["id", ["product_name", "productName"], ["stock_quantity", "stockQuantity"], "price"],
 			include: [
 				{
 					model: Category,
@@ -361,19 +333,16 @@ const getProductsByCategoryController = async (req, res) => {
 			where: {
 				CategoryId: id,
 			},
-			attributes: [
-				["product_name", "productName"],
-				["stock_quantity", "stockQuantity"],
-				"id",
-				"description",
-				"price",
-			],
+			attributes: [["product_name", "productName"], ["stock_quantity", "stockQuantity"], "id", "description", "price"],
 			include: [
 				{
 					model: Category,
 					attributes: [["category_name", "categoryName"], "id"],
 				},
-				{ model: Image, attributes: ["filename", "filePath", "id"] },
+				{
+					model: Image,
+					attributes: ["filename", "filePath", "id"],
+				},
 			],
 		})
 		if (products.length < 1) {
