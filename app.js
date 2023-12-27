@@ -14,7 +14,7 @@ app.use(express.json())
 // 		credentials: true,
 // 	})
 // )
-app.use(cors(          ))
+app.use(cors())
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
@@ -45,8 +45,9 @@ app.use("/profile", ProfileRouter)
 // 		console.log("Server running on port 4000")
 // 	})
 // })
+const port = process.env.SERVER_PORT || 4000
 db.sequelize.sync().then(() => {
-	app.listen(4000, () => {
+	app.listen(port, () => {
 		console.log("Server running on port 4000")
 	})
 })
