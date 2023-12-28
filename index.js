@@ -45,7 +45,7 @@ app.use("/profile", ProfileRouter)
 // 		console.log("Server running on port 4000")
 // 	})
 // })
-const port = process.env.SERVER_PORT || 4000
+const port = process.env.PORT || 4000
 db.sequelize.sync().then(() => {
 	app.listen(port, () => {
 		console.log(`Roboshoppp server is running`)
