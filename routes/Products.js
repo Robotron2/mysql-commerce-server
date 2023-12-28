@@ -9,7 +9,8 @@ const {
 	deleteProductController,
 	getProductsByFilterController,
 	searchProduct,
-    getProductsByCategoryController
+	getProductsByCategoryController,
+	getRandomProductsShowcaseController,
 } = require("../controllers/productsController")
 const multer = require("multer")
 const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
@@ -42,21 +43,9 @@ const upload = multer({
 })
 
 //create product
-router.post(
-	"/create-product",
-	requireSignIn,
-	isAdmin,
-	upload.single("image"),
-	createProductController
-)
+router.post("/create-product", requireSignIn, isAdmin, upload.single("image"), createProductController)
 //update product detail
-router.put(
-	"/product/:id",
-	requireSignIn,
-	isAdmin,
-	upload.single("image"),
-	updateSingleProductController
-)
+router.put("/product/:id", requireSignIn, isAdmin, upload.single("image"), updateSingleProductController)
 //delete product
 router.delete("/product/:id", requireSignIn, isAdmin, deleteProductController)
 
@@ -73,5 +62,6 @@ router.get("/filter", getProductsByFilterController)
 router.get("/search", searchProduct)
 
 router.get("/category", getProductsByCategoryController)
+router.get("/show-case", getRandomProductsShowcaseController)
 
 module.exports = router

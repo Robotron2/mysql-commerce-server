@@ -84,9 +84,10 @@ const getAllProductsController = async (req, res) => {
 		return res.status(200).json({
 			products: products.rows,
 			totalPages: Math.ceil(products.count / limit),
+			success: true,
 		})
 	} catch (error) {
-		res.status(500).json({ error: "Error fetching products." })
+		res.status(500).json({ success: false, error: "Error fetching products." })
 	}
 }
 
@@ -282,7 +283,7 @@ const getProductsByFilterController = async (req, res) => {
 		return res.status(200).json({ products: products, success: true })
 	} catch (error) {
 		// console.error(error)
-		res.status(500).json({ message: "Internal Server Error" })
+		res.status(500).json({ message: "Internal Server Error", success: false })
 	}
 }
 
@@ -314,22 +315,32 @@ const searchProduct = async (req, res) => {
 			],
 		})
 
-		res.json({ products })
+		res.json({ success: true, products })
 	} catch (error) {
 		// console.error(error)
-		res.status(500).json({ error: "Internal Server Error" })
+		res.status(500).json({ success: false, error: "Internal Server Error" })
 	}
 }
 
 const getProductsByCategoryController = async (req, res) => {
 	const { id } = req.query
 
+	const page = req.query.page || 1
+	const limit = parseInt(req.query.limit) || 4
+	const offset = (page - 1) * limit
+
+	const sortBy = req.query.sortBy || "createdAt"
+	const sortOrder = req.query.sortOrder || "desc"
+
 	try {
 		if (!id || isNaN(id)) {
 			throw Error("Please provide a valid id")
 		}
 
-		const products = await Product.findAll({
+		const products = await Product.findAndCountAll({
+			limit,
+			offset,
+			order: [[sortBy, sortOrder]],
 			where: {
 				CategoryId: id,
 			},
@@ -345,6 +356,7 @@ const getProductsByCategoryController = async (req, res) => {
 				},
 			],
 		})
+
 		if (products.length < 1) {
 			return res.status(200).json({
 				success: false,
@@ -353,9 +365,16 @@ const getProductsByCategoryController = async (req, res) => {
 			})
 		}
 
+		const categoryData = await Category.findByPk(id, {
+			attributes: [["category_name", "categoryName"], "id"],
+		})
+
 		return res.status(200).json({
 			success: true,
 			products,
+			categoryData,
+			products: products.rows,
+			totalPages: Math.ceil(products.count / limit),
 		})
 	} catch (error) {
 		console.log(error)
@@ -363,6 +382,41 @@ const getProductsByCategoryController = async (req, res) => {
 			error: error.message,
 			success: false,
 		})
+	}
+}
+
+const getRandomProductsShowcaseController = async (req, res) => {
+	const page = req.query.page || 1
+	const limit = parseInt(req.query.limit) || 4
+	const offset = (page - 1) * limit
+
+	const sortBy = req.query.sortBy || "createdAt"
+	const sortOrder = req.query.sortOrder || "desc"
+
+	try {
+		const products = await Product.findAll({
+			limit,
+			offset,
+			order: [[sortBy, sortOrder]],
+			attributes: ["id"],
+			include: [
+				{
+					model: Category,
+					attributes: ["id", ["category_name", "categoryName"]],
+				},
+				{
+					model: Image,
+					attributes: [["filename", "fileName"], "filePath"],
+				},
+			],
+		})
+
+		return res.status(200).json({
+			products,
+			success: true,
+		})
+	} catch (error) {
+		res.status(500).json({ success: false, error: "Error fetching products." })
 	}
 }
 
@@ -375,4 +429,5 @@ module.exports = {
 	getProductsByFilterController,
 	searchProduct,
 	getProductsByCategoryController,
+	getRandomProductsShowcaseController,
 }
