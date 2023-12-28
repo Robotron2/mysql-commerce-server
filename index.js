@@ -8,19 +8,26 @@ const app = express()
 const db = require("./models")
 
 app.use(express.json())
-app.use(
-	cors({
-		origin: ["http://localhost:5173", "http://192.168.43.165:5173", "https://roboshoppp.vercel.app"],
-		credentials: true,
-	})
-)
-
-// app.use(cors())
 
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 app.use("/public", express.static("public", { maxAge: 31536000 }))
+
+const allowedOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2, process.env.ORIGIN_3]
+
+const corsOptions = {
+	origin: function (origin, callback) {
+		if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:") || origin.startsWith("http://192.168.43.")) {
+			callback(null, true)
+		} else {
+			callback(new Error("Not allowed by CORS"))
+		}
+	},
+	credentials: true,
+}
+
+app.use(cors(corsOptions))
 
 //Routers
 const UserRouter = require("./routes/Users")
