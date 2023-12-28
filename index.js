@@ -10,10 +10,12 @@ const db = require("./models")
 app.use(express.json())
 app.use(
 	cors({
-		origin: ["http://localhost:5173", "http://192.168.43.165:5173"],
+		origin: ["http://localhost:5173", "http://192.168.43.165:5173", "https://roboshoppp.vercel.app"],
 		credentials: true,
 	})
 )
+
+// app.use(cors())
 
 app.use(morgan("dev"))
 app.use(express.urlencoded({ extended: true }))
