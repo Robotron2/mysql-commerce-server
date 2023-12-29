@@ -9,27 +9,59 @@ const {
 	deleteProductController,
 	getProductsByFilterController,
 	searchProduct,
-    getProductsByCategoryController
+	getProductsByCategoryController,
 } = require("../controllers/productsController")
 const multer = require("multer")
+const fs = require("fs")
 const { isAdmin, requireSignIn } = require("../middlewares/authMididdleware")
+
+// const multerStorage = multer.diskStorage({
+// 	destination: (req, file, cb) => {
+// 		cb(null, "public")
+// 	},
+// 	filename: (req, file, cb) => {
+// 		const ext = file.mimetype.split("/")[1]
+// 		cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`)
+// 	},
+// })
+
+// const multerFilter = (req, file, cb) => {
+// 	if (file.mimetype.split("/")[1] === "png") {
+// 		cb(null, true)
+// 	} else if (file.mimetype.split("/")[1] === "jpg") {
+// 		cb(null, true)
+// 	} else if (file.mimetype.split("/")[1] === "jpeg") {
+// 		cb(null, true)
+// 	} else {
+// 		cb(new Error("Not a Valid Image File!!"), false)
+// 	}
+// }
+
+// const upload = multer({
+// 	storage: multerStorage,
+// 	fileFilter: multerFilter,
+// })
 
 const multerStorage = multer.diskStorage({
 	destination: (req, file, cb) => {
-		cb(null, "public")
+		const destinationFolder = "public/files"
+
+		if (!fs.existsSync(destinationFolder)) {
+			fs.mkdirSync(destinationFolder, { recursive: true })
+		}
+
+		cb(null, destinationFolder)
 	},
 	filename: (req, file, cb) => {
 		const ext = file.mimetype.split("/")[1]
-		cb(null, `files/admin-${file.fieldname}-${Date.now()}.${ext}`)
+		cb(null, `admin-${file.fieldname}-${Date.now()}.${ext}`)
 	},
 })
 
 const multerFilter = (req, file, cb) => {
-	if (file.mimetype.split("/")[1] === "png") {
-		cb(null, true)
-	} else if (file.mimetype.split("/")[1] === "jpg") {
-		cb(null, true)
-	} else if (file.mimetype.split("/")[1] === "jpeg") {
+	const allowedExtensions = ["png", "jpg", "jpeg"]
+
+	if (allowedExtensions.includes(file.mimetype.split("/")[1])) {
 		cb(null, true)
 	} else {
 		cb(new Error("Not a Valid Image File!!"), false)
@@ -42,21 +74,9 @@ const upload = multer({
 })
 
 //create product
-router.post(
-	"/create-product",
-	requireSignIn,
-	isAdmin,
-	upload.single("image"),
-	createProductController
-)
+router.post("/create-product", requireSignIn, isAdmin, upload.single("image"), createProductController)
 //update product detail
-router.put(
-	"/product/:id",
-	requireSignIn,
-	isAdmin,
-	upload.single("image"),
-	updateSingleProductController
-)
+router.put("/product/:id", requireSignIn, isAdmin, upload.single("image"), updateSingleProductController)
 //delete product
 router.delete("/product/:id", requireSignIn, isAdmin, deleteProductController)
 
