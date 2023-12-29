@@ -14,25 +14,24 @@ app.use(express.urlencoded({ extended: true }))
 app.use(express.static("public"))
 app.use("/public", express.static("public", { maxAge: 31536000 }))
 
-// const allowedOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2, process.env.ORIGIN_3]
-
-// const corsOptions = {
-// 	origin: function (origin, callback) {
-// 		if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:") || origin.startsWith("http://192.168.43.")) {
-// 			callback(null, true)
-// 		} else {
-// 			callback(new Error("Not allowed by CORS"))
-// 		}
-// 	},
-// 	credentials: true,
-// }
+const allowedOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2, process.env.ORIGIN_3]
 
 const corsOptions = {
-	origin: "*",
+	origin: function (origin, callback) {
+		if (!origin || allowedOrigins.includes(origin) || origin.startsWith("http://localhost:") || origin.startsWith("http://192.168.43.")) {
+			callback(null, true)
+		} else {
+			callback(new Error("Not allowed by CORS"))
+		}
+	},
 	credentials: true,
 }
 
 app.use(cors(corsOptions))
+// const corsOptions = {
+// 	origin: "*",
+// 	credentials: true,
+// }
 
 app.use(cors(corsOptions))
 
