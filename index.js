@@ -7,11 +7,9 @@ const app = express()
 
 const db = require("./models")
 
-const allowedOrigins = [process.env.ORIGIN_1, process.env.ORIGIN_2, process.env.ORIGIN_3]
-
 app.use(cors())
 app.use(function (req, res, next) {
-	res.header("Access-Control-Allow-Origin", allowedOrigins)
+	res.header("Access-Control-Allow-Origin", "http://192.168.43.165:5173")
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
 	next()
 })
