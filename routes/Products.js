@@ -10,10 +10,7 @@ const {
 	getProductsByFilterController,
 	searchProduct,
 	getProductsByCategoryController,
-<<<<<<< HEAD
-=======
 	getRandomProductsShowcaseController,
->>>>>>> main
 } = require("../controllers/productsController")
 const multer = require("multer")
 const fs = require("fs")
