@@ -201,6 +201,62 @@ const updateSingleProductController = async (req, res) => {
 	}
 }
 
+// const deleteProductController = async (req, res) => {
+// 	try {
+// 		const { id } = req.params
+
+// 		const product = await Product.findByPk(id, {
+// 			include: [
+// 				{
+// 					model: Image,
+// 				},
+// 			],
+// 		})
+// 		const imageId = product.Image.id
+
+// 		if (!product) {
+// 			return res.status(404).json({ error: "Product not found" })
+// 		}
+
+// 		const imageName = product.Image.filename
+
+// 		const image = await Image.findOne({ where: { id: imageId } })
+
+// 		if (image) {
+// 			// const image_path = path.join(__dirname, "public", "files", `${imageName}`)
+// 			const imageName = product.Image.filename
+// 			const image_path = "public/files/" + imageName
+
+// 			console.group()
+// 			console.log("Group log start\n")
+// 			console.log("Image Name:", imageName)
+// 			console.log("Full Path:", image_path)
+// 			console.log(fs.existsSync(image_path))
+// 			console.log(fs.unlinkSync(image_path))
+// 			console.log("\n Group log end")
+// 			console.groupEnd()
+
+// 			if (fs.existsSync(image_path)) {
+// 			fs.unlinkSync(image_path)
+// 				await image.destroy()
+// 				await product.destroy()
+// 				console.log("Deleted image")
+// 				return res.status(200).json({
+// 					message: "Product deleted successfully",
+// 					success: true,
+// 				})
+// 			}
+// 		} else {
+// 			return res.status(500).json({ message: "Product not deleted", success: false })
+// 		}
+// 	} catch (error) {
+// 		console.error(error)
+// 		return res.status(500).json({ error: "Internal server error", success: false })
+// 	}
+// }
+
+///////////////////////////////////////////// Product Browsing Controllers /////////////////////////////////////////////
+
 const deleteProductController = async (req, res) => {
 	try {
 		const { id } = req.params
@@ -212,43 +268,63 @@ const deleteProductController = async (req, res) => {
 				},
 			],
 		})
-		const imageId = product.Image.id
 
 		if (!product) {
 			return res.status(404).json({ error: "Product not found" })
 		}
-		// // console.log(product.Image)
 
 		const imageName = product.Image.filename
+		const image_path = path.join("public", "files", imageName)
 
-		const image = await Image.findOne({ where: { id: imageId } })
+		const directoryContents = fs.readdirSync("public/files") //read contents
+		const fileStats = fs.statSync(image_path)
+		console.log("File Stats:", fileStats)
+		console.log("Directory Contents:", directoryContents)
 
-		if (image) {
-			// const image_path = path.join(__dirname, "public", "files", `${imageName}`)
-			const image_path = `public/files/${imageName}`
-			console.log(image_path)
-			console.log(fs.existsSync(image_path))
+		console.log("\n Image Name:", imageName)
+		console.log("Full Path:", image_path)
+		console.log(fs.existsSync(image_path))
 
-			if (fs.existsSync(image_path)) {
+		if (fs.existsSync(image_path)) {
+			try {
 				fs.unlinkSync(image_path)
-				await image.destroy()
-				await product.destroy()
 				console.log("Deleted image")
+			} catch (unlinkError) {
+				console.error("Error deleting file:", unlinkError)
+				return res.status(500).json({
+					message: "Error deleting file",
+					success: false,
+				})
+			}
+
+			// Continue with the database operations only if file deletion is successful
+			try {
+				await product.Image.destroy()
+				await product.destroy()
+				console.log("Deleted product")
 				return res.status(200).json({
 					message: "Product deleted successfully",
 					success: true,
 				})
+			} catch (dbError) {
+				console.error("Error deleting product from database:", dbError)
+				return res.status(500).json({
+					message: "Error deleting product from database",
+					success: false,
+				})
 			}
 		} else {
-			return res.status(500).json({ message: "Product not deleted", success: false })
+			console.log("File does not exist at the specified path.")
+			return res.status(500).json({
+				message: "File does not exist at the specified path.",
+				success: false,
+			})
 		}
 	} catch (error) {
-		// console.error(error)
-		return res.status(500).json({ error: "Internal server error" })
+		console.error("Internal server error:", error)
+		return res.status(500).json({ error: "Internal server error", success: false })
 	}
 }
-
-///////////////////////////////////////////// Product Browsing Controllers /////////////////////////////////////////////
 
 const getProductsByFilterController = async (req, res) => {
 	const { category, minPrice, maxPrice, sort } = req.query
