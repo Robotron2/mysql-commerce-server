@@ -10,6 +10,10 @@ const {
 	getProductsByFilterController,
 	searchProduct,
 	getProductsByCategoryController,
+<<<<<<< HEAD
+=======
+	getRandomProductsShowcaseController,
+>>>>>>> main
 } = require("../controllers/productsController")
 const multer = require("multer")
 const fs = require("fs")
@@ -93,5 +97,6 @@ router.get("/filter", getProductsByFilterController)
 router.get("/search", searchProduct)
 
 router.get("/category", getProductsByCategoryController)
+router.get("/show-case", getRandomProductsShowcaseController)
 
 module.exports = router
